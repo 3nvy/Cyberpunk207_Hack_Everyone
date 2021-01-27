@@ -1,37 +1,69 @@
 
 IProps = {
-	enableDebug = true,
+	enableDebug = false,
 	deltaTime = 0,
 	isUploadingQHCOmmands = false,
 	qhNameList = {
 		{
-			hash = 2804661751,
+			hash = 3116789880,
 			name = "Ping"
 		},
 		{
-			hash = 3319380164,
+			hash = 612394680,
 			name = "Reboot Optics"
 		},
 		{
-			hash = 4056429917,
+			hash = 523263573,
 			name = "Contagion"
 		},
 		{
-			hash = 1394070431,
+			hash = 190881063,
 			name = "Sonic Shock"
 		},
 		{
-			hash = 1234964954,
+			hash = 2537897906,
 			name = "Suicide"
 		},
 		{
-			hash = 901614988,
+			hash = 988968086,
 			name = "Cyberpsychosis"
 		},
 		{
-			hash = 901614988,
-			name = "Cyberpsychosis"
-		}
+			hash = 4273202386,
+			name = "Weapon Glitch"
+		},
+		{
+			hash = 2534130900,
+			name = "Detonate Grenade"
+		},
+		{
+			hash = 953801423,
+			name = "Cyberware Malfunction"
+		},
+		{
+			hash = 880772118,
+			name = "Synapse Burnout"
+		},
+		{
+			hash = 520988073,
+			name = "System Reset"
+		},
+		{
+			hash = 249499564,
+			name = "Memory Wipe"
+		},
+		{
+			hash = 3396834708,
+			name = "Cripple Movement"
+		},
+		{
+			hash = 3189733290,
+			name = "Whistle"
+		},
+		{
+			hash = 2582207146,
+			name = "Overheat"
+		},
 	}
 }
 
@@ -104,7 +136,6 @@ function RevealQuickHacks(npc, player)
 			
 			-- newCommand.description = actionRecord:ObjectActionUI():Description()
 			newCommand.icon = actionRecord:ObjectActionUI():CaptionIcon():TexturePartID():GetID()
-			-- newCommand.iconCategory = actionRecord:GameplayCategory():IconName()
 			newCommand.type = actionRecord:ObjectActionType():Type()
 			newCommand.actionOwner = npc:GetEntityID()
 			newCommand.isInstant = false
@@ -115,7 +146,20 @@ function RevealQuickHacks(npc, player)
 			newCommand.category = actionRecord:HackCategory()
 			newCommand.actionCompletionEffects = actionRecord:CompletionEffects()
 			
-			-- -- TODO: Work Cooldowns
+			-- QuickHack Names
+			-- Handle Custom Titles
+			newCommand.title = "QuickHack "..i
+			newCommand.description = "QuickHack "..i
+			for _, QHData in pairs(IProps.qhNameList) do 
+
+				if QHData.hash == newCommand.icon.hash then
+					newCommand.title = QHData.name
+					newCommand.description = QHData.name
+				end
+				
+			end
+
+			-- Work Cooldowns
 			actionStartEffects = actionRecord:StartEffects()
 			for _, effect in pairs(actionStartEffects) do 
 
@@ -139,9 +183,7 @@ function RevealQuickHacks(npc, player)
 			newCommand.costRaw = puppetAction:GetBaseCost()
 			newCommand.cost = puppetAction:GetCost();
 
-			-- Handle Custom Titles
-			newCommand.title = "QuickHack ".._
-			newCommand.description = "QuickHack ".._
+			
 			-- newCommand.title = puppetAction.actionName.value
 			-- newCommand.description = puppetAction.actionName.value
 
