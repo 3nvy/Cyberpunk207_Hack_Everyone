@@ -1,8 +1,11 @@
 
-IProps = {
+local IProps = {
 	enableDebug = false,
 	deltaTime = 0,
+	drawWindow = false,
 	isUploadingQHCOmmands = false,
+	modName = 'Hack Everyone',
+	modVersion = '1.0.0',
 	qhNameList = {
 		{
 			hash = 3116789880,
@@ -67,19 +70,17 @@ IProps = {
 	}
 }
 
+local Config = {
+	disableOnCivilians = false,
+}
+
+local json = require('plugins.cyber_engine_tweaks.scripts.json.json')
+local Utils = require('plugins.cyber_engine_tweaks.mods.'..IProps.modName..".utilities")
+
 local CheckPrereqs = Game['gameRPGManager::CheckPrereqs;array<IPrereq_Record>GameObject']
 local CalculateStatModifiers = Game['gameRPGManager::CalculateStatModifiers;FloatFloatFloatarray<StatModifier_Record>GameInstanceGameObjectStatsObjectIDStatsObjectIDStatsObjectID']
 local GetPlayerQuickHackListWithPenetration = Game['gameRPGManager::GetPlayerQuickHackListWithPenetration;PlayerPuppet']
 
-registerForEvent("onInit", function()
-	print("[Hack Everyone] Initialized | Version: 1.0.0")
-end)
-
-function Log(message)
-	if IProps.enableDebug then
-		print("[Hack Everyone] "..message)
-	end
-end
 
 function RefreshHUD(npc, player)
 	-- npc:RegisterToHUDManager(true)
@@ -238,7 +239,8 @@ function RevealQuickHacks(npc, player)
 
 	Game.GetUISystem():QueueEvent(quickSlotsManagerNotification)
 	IProps.isUploadingQHCOmmands = false
-	Log("QuickHacks Uploaded")
+
+	Utils.Log(IProps.enableDebug, IProps.modName, "QuickHacks Uploaded")
 end
 
 function runUpdates()
@@ -255,22 +257,64 @@ function runUpdates()
 			RevealQuickHacks(npc, player)
 		end
 
-		if not npc:GetHudManager():IsRegistered(npc:GetEntityID()) then
+		if not Config.disableOnCivilians and not npc:GetHudManager():IsRegistered(npc:GetEntityID()) then
 			npc:RegisterToHUDManager(true)
-			Log("NPC QH Registered")
+			Utils.Log(IProps.enableDebug, IProps.modName, "NPC QH Registered")
 		end
 	
 	end
 
 end
 
+function loadSavedConfig()
+	local config = Utils.LoadConfig(IProps.modName, 'config.json')
+
+	if config then
+		Config = json.decode(config)
+	end
+end
+
+registerForEvent("onInit", function()
+	loadSavedConfig()
+	print("["..IProps.modName.."] Initialized | Version: "..IProps.modVersion)
+end)
+
 registerForEvent("onUpdate", function(deltaTime)
 	
 	IProps.deltaTime = IProps.deltaTime + deltaTime
 
-    if IProps.deltaTime > 1 then
-        runUpdates()
+	if IProps.deltaTime > 1 then
+		runUpdates()
         IProps.deltaTime = IProps.deltaTime - 1
     end
+
+end)
+
+registerForEvent("onOverlayOpen", function()
+	IProps.drawWindow = true
+end)
+  
+registerForEvent("onOverlayClose", function()
+	IProps.drawWindow = false
+end)
+
+
+registerForEvent("onDraw", function()
+	
+	if IProps.drawWindow then
+
+		ImGui.SetNextWindowPos(100, 500, ImGuiCond.FirstUseEver) -- set window position x, y
+		ImGui.SetNextWindowSize(250, 60, ImGuiCond.Appearing) -- set window size w, h
+
+		if ImGui.Begin("Hack Everyone Setup") then
+			local disableOnCivilians = ImGui.Checkbox("Disable Hacks on Civilians", Config.disableOnCivilians)
+            if disableOnCivilians ~= Config.disableOnCivilians then
+				Config.disableOnCivilians = disableOnCivilians
+				Utils.SaveConfig(IProps.modName, 'config.json', json.encode(Config))
+            end
+		end
+		ImGui.End()
+
+	end
 
 end)
