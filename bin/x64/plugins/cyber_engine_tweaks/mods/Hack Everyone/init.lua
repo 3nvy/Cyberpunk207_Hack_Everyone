@@ -5,7 +5,7 @@ local IProps = {
 	drawWindow = false,
 	isUploadingQHCOmmands = false,
 	modName = 'Hack Everyone',
-	modVersion = '1.0.0',
+	modVersion = '1.0.1',
 	qhNameList = {
 		{
 			hash = 3116789880,
