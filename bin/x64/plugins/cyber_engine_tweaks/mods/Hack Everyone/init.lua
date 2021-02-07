@@ -74,8 +74,8 @@ local Config = {
 	disableOnCivilians = false,
 }
 
-local json = require('plugins.cyber_engine_tweaks.scripts.json.json')
-local Utils = require('plugins.cyber_engine_tweaks.mods.'..IProps.modName..".utilities")
+local json = require('json')
+local Utils = require('utilities')
 
 local CheckPrereqs = Game['gameRPGManager::CheckPrereqs;array<IPrereq_Record>GameObject']
 local CalculateStatModifiers = Game['gameRPGManager::CalculateStatModifiers;FloatFloatFloatarray<StatModifier_Record>GameInstanceGameObjectStatsObjectIDStatsObjectIDStatsObjectID']
